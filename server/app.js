@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const expressWs = require('express-ws')(app);
 
+let aWss = expressWs.getWss('/');
+
 app.use((req, res, next) => {
     console.log('middleware');
     req.testing = 'testing';
@@ -17,7 +19,9 @@ app.get('/', (req, res, next) => {
 app.ws('/', (ws, req) => {
     ws.on('message', (msg) => {
         console.log(msg);
-        ws.send(msg);
+        aWss.clients.forEach(function (client) {
+            client.send(msg);
+        });
     });
     console.log('socket', req.testing);
 });
